@@ -156,6 +156,7 @@ public:
         return rank(l + 1, a, i, p);
     }
     int select(int a, int j) {
+        if (j == 0) return NULL;
         return select(0, a, j, 0);
     }
     int select(int l, int a, int j, int p) {
@@ -172,7 +173,7 @@ public:
             j = select(l + 1, a, j, p);
             //cout << "   ++l, a, j, p = " << l + 1 << ", " << (char)a << ", " << j << ", " << p << endl;
             if (f_select0_or_1B(l, j - Z[l]) == -1) return -1;
-            return f_select0_or_1B(l, j - Z[l]);
+            return f_select0_or_1B(l, j);
         }
     }
     void print() {
@@ -231,9 +232,9 @@ int main(void) {
     auto beg = high_resolution_clock::now();
     auto end = high_resolution_clock::now();
     cout << "text_size,sigma,matrix_construction_time,values_map_construction_time,avg_access_time,avg_rank_time,avg_select_time,memory" << endl;
-    for (int sigma_magnitude = 250; sigma_magnitude < 5001; sigma_magnitude+=250) {
-        for (int txt_magnitude = 1000000; txt_magnitude < 2000001; txt_magnitude+=1000000) {
-            int num_of_runs = 3;
+    for (int sigma_magnitude = 2; sigma_magnitude < 3; sigma_magnitude++) {
+        for (int txt_magnitude = 1; txt_magnitude < 2; txt_magnitude++) {
+            int num_of_runs = 1;
             result = 0;
             sum_access_time = 0;
             sum_rank_time = 0;
@@ -245,10 +246,11 @@ int main(void) {
             values_construction_time = 0;
             matrix_construction_time = 0;
 
-            sigma = sigma_magnitude;
-            //sigma = pow(2, sigma_magnitude);
+            //sigma = sigma_magnitude;
+            sigma = pow(2, sigma_magnitude);
+            txt_size = pow(10, txt_magnitude);
 
-            txt_size = txt_magnitude;
+            //txt_size = txt_magnitude;
             /*
             if (txt_magnitude < 1000000) {
                 txt_magnitude += 100000;
@@ -256,7 +258,6 @@ int main(void) {
                 txt_magnitude += 250000;
             }
             */
-            //txt_size = pow(2, txt_magnitude);
             for (int run = 1; run <= num_of_runs; run++) {
                 txt.clear();
                 alphabet.clear();
@@ -276,7 +277,7 @@ int main(void) {
                     txt.push_back(a);
                 }
                 //cout << endl;
-                //copy(txt.begin(), txt.end(), ostream_iterator<int>(cout, ",")); cout << endl;
+                copy(txt.begin(), txt.end(), ostream_iterator<int>(cout, ",")); cout << endl;
                 //Stvaranje strukture s svim znakovima abecede i njihovim vrijednostima.
                 beg = high_resolution_clock::now();
                 int rows = ceil(log2(alphabet.size()));
@@ -320,7 +321,7 @@ int main(void) {
                         end = high_resolution_clock::now();
                         sum_select_time += duration_cast<microseconds>(end - beg).count();
                         select_op_counter++;
-                        //cout << "select(" << a << ", " << j << ")," << result << "," << duration_cast<microseconds>(end - beg).count() << endl;
+                        cout << "select(" << a << ", " << j << ")," << result << "," << duration_cast<microseconds>(end - beg).count() << endl;
                         if (select_op_counter % 100 == 0) break;
                     }
                 }
